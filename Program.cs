@@ -1,3 +1,4 @@
+using DataWarehouseApi;
 using DataWarehouseApi.Views;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -21,6 +22,9 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
     app.MapOpenApi();
 }
+
+//Added a timer to time requests for future performance monitoring
+app.UseTimingMiddleware();
 
 app.UseHttpsRedirection();
 
