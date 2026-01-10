@@ -1,7 +1,10 @@
 using DataWarehouseApi;
 using DataWarehouseApi.Views;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,21 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<Goldcontext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnections")));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration.GetValue<string>("AppSettings:Issuer"),
+            ValidAudience = builder.Configuration.GetValue<string>("AppSettings:Audience"),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!))
+        };
+    });
 
 
 var app = builder.Build();
@@ -26,7 +44,11 @@ if (app.Environment.IsDevelopment())
 //Added a timer to time requests for future performance monitoring
 app.UseTimingMiddleware();
 
+app.UseAuthentication();
+
 app.UseHttpsRedirection();
+
+
 
 app.UseAuthorization();
 

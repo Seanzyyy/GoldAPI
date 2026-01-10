@@ -1,4 +1,5 @@
 ﻿using DataWarehouseApi.Views;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace DataWarehouseApi.Controllers
             _goldContext = goldContext;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("customers")]
         public async Task<ActionResult> GetCustomers()
@@ -28,11 +30,13 @@ namespace DataWarehouseApi.Controllers
                 );
         }
 
+        [Authorize]
         [HttpGet("products")]
         public async Task<ActionResult> GetProducts()
         {
             return Ok(await _goldContext.DimProducts.ToListAsync());
         }
+
 
         [HttpGet]
         [Route("Orders")]
